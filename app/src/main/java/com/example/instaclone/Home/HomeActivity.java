@@ -22,9 +22,9 @@ import androidx.viewpager.widget.ViewPager;
 public class HomeActivity extends AppCompatActivity {
 
     private static final String TAG = "HomeActivity";
-    private static final int ACTIVITY_NUM = 0 ;
+    private static final int ACTIVITY_NUM = 0;
 
-    public FirebaseAuth mAuth; // Authentication
+    public FirebaseAuth mAuth; // For checking current user instance
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,23 +33,18 @@ public class HomeActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: starting.");
 
-         mAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance(); // Initializing firebase auth instance
 
-         initImageLoader();
+        initImageLoader();
 
-         setupBottomNavigationView();
+        setupBottomNavigationView();
 
-         setupViewPager();
+        setupViewPager();
 
-         onStart();
-
+        onStart();
 
 
     }
-
-    /* ---------------------------------------------------------------------------------
-               FIREBASE FIREBASE FIREBASE
-     ----------------------------------------------------------------------------------*/
 
 
     /* If user isn't logged in start login activity */
@@ -57,14 +52,14 @@ public class HomeActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
 
-        if(mAuth.getCurrentUser() == null){
+        if (mAuth.getCurrentUser() == null) {
             finish();
             startActivity(new Intent(this, LoginActivity.class));
         }
     }
 
 
-    private void initImageLoader(){
+    private void initImageLoader() {
         UniversalImageLoader universalImageLoader = new UniversalImageLoader(HomeActivity.this);
         ImageLoader.getInstance().init(universalImageLoader.getConfig());
     }
@@ -72,14 +67,13 @@ public class HomeActivity extends AppCompatActivity {
 
     /* 3 tabs Camera,Icon,Messages */
 
-    private void setupViewPager(){
+    private void setupViewPager() {
         SectionsPagerAdapter adapter = new SectionsPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new CameraFragment());// 0
         adapter.addFragment(new HomeFragment()); // 1
         adapter.addFragment(new MessagesFragment()); // 2
         ViewPager viewPager = (ViewPager) findViewById(R.id.container);
         viewPager.setAdapter(adapter);
-
 
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -93,7 +87,7 @@ public class HomeActivity extends AppCompatActivity {
 
     /* Bottom Navigation View Setup */
 
-    private void setupBottomNavigationView(){
+    private void setupBottomNavigationView() {
         Log.d(TAG, "setupBottomNavigationView: settingUpBottomNavigationView");
         BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomView);
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationViewEx);
@@ -103,62 +97,7 @@ public class HomeActivity extends AppCompatActivity {
         menuItem.setChecked(true);
     }
 
-    /*-------------------------------------------FIREBASE------------------------------------------*/
-
-/*
-    //If user is logged in
-    private void checkCurrentUser(FirebaseUser user){
-
-        Log.d(TAG, "checkCurrentUser: checking if user is logged in");
-
-        if( user == null){
-            Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-            startActivity(intent);
-        }
-        
-    }
-
-    // Firebase auth object
-    private void setupFirebaseAuth(){
-
-        mAuth = FirebaseAuth.getInstance();
-
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-
-                //check if user is logged in or not
-
-                checkCurrentUser(user);
-
-                if( user != null){
-                    // user signed in
-                    Log.d(TAG, "onAuthStateChanged: signed_in" + user.getUid());
-                }else{
-                    // user signed out
-                    Log.d(TAG, "onAuthStateChanged: signed_out");
-                }
-                // .....
-               // mAuth.addAuthStateListener(mAuthStateListener);
-            }
-        };
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-       // if(mAuthStateListener == null) {
-         //   mAuth.addAuthStateListener(mAuthStateListener);
-        //}
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAuthStateListener != null) { mAuth.removeAuthStateListener(mAuthStateListener);
-        }
-    }
-                   */
 }
+
+
+
