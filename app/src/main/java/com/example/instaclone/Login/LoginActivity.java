@@ -2,11 +2,9 @@ package com.example.instaclone.Login;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,77 +22,57 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
+    TextView mSignUpActivity;
 
-    private static final String TAG = "LoginActivity";
+    private FirebaseAuth mAuth ;
 
-    private FirebaseAuth mAuth;
-
-    private FirebaseUser user;
-
-    private ProgressBar mProgressBar ;
+    private Button bLogin ;
 
     private EditText mEmail , mPassword ;
 
-    private TextView register ;
+    private String sEmail , sPassword ;
 
-    TextView linkSignUp ;
-
-    private Button logIN ;
-
-    String email , password ;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_login);
 
-        Log.d(TAG, "onCreate: started.");
+        mAuth = FirebaseAuth.getInstance();
 
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+        mSignUpActivity = findViewById(R.id.link_signup);
 
-        register = (TextView) findViewById(R.id.link_signup);
+        bLogin = findViewById(R.id.btn_login);
 
         mEmail    = findViewById(R.id.input_email);
         mPassword = findViewById(R.id.input_password);
 
-        linkSignUp = (TextView) findViewById(R.id.link_signup);
 
-        logIN = (Button) findViewById(R.id.btn_login);
-
-        mProgressBar.setVisibility(View.GONE);
-
-        mAuth = FirebaseAuth.getInstance();
-
-        // Retrieves user inputs
-
-        register.setOnClickListener(new View.OnClickListener() {
+        mSignUpActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(intent);
-                finish();
+                startActivity(new Intent(LoginActivity.this , RegisterActivity.class));
             }
         });
 
-
-        logIN.setOnClickListener(new View.OnClickListener() {
+        bLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                email = mEmail.getText().toString();
-                password = mPassword.getText().toString();
+                sEmail = mEmail.getText().toString();
+                sPassword = mPassword.getText().toString();
 
-                if(email.isEmpty()){
+                if(sEmail.isEmpty()){
                     mEmail.setError("Enter a valid Email");
                     mEmail.requestFocus();
-                }else if(password.isEmpty()){
+                }else if(sPassword.isEmpty()){
                     mPassword.setError("Enter a valid Password");
                     mPassword.requestFocus();
-                }else if((email.isEmpty()) && (password.isEmpty())){
+                }else if((sEmail.isEmpty()) && (sPassword.isEmpty())){
                     Toast.makeText(LoginActivity.this,"Fields are empty",Toast.LENGTH_SHORT).show();
-                }else if(!(email.isEmpty() && password.isEmpty())){
-                    signIN();
+                }else if(!(sEmail.isEmpty() && sPassword.isEmpty())){
+
+                    login();
 
                 }else {
                     Toast.makeText(LoginActivity.this,"Error",Toast.LENGTH_SHORT).show();
@@ -102,40 +80,24 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
-
-        linkSignUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-                Intent intent = new Intent(LoginActivity.this,RegisterActivity.class);
-                startActivity(intent);
-            }
-        });
-
-
     }
 
+    private void login(){
 
-
-
-
-
-   private void signIN() {
-        mAuth.signInWithEmailAndPassword(email , password)
+        mAuth.signInWithEmailAndPassword(sEmail, sPassword)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success");
-                            finish();
-                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                            // Sign in success,
 
-                            startActivity(intent);
-                            // If user will press back he/she won't be able to comeback to login activity
+                            FirebaseUser user = mAuth.getCurrentUser();
+
+                            updateUI(user);
+
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
+
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
 
@@ -144,8 +106,14 @@ public class LoginActivity extends AppCompatActivity {
                         // ...
                     }
                 });
+
     }
 
+    private void updateUI(FirebaseUser user){
+        if(user != null){
+            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+        }
+    }
 
 
 }
